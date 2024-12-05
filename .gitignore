@@ -1,0 +1,5 @@
+data/
+results/
+setup/
+*.csv
+*.bz2
