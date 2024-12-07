@@ -26,7 +26,7 @@ def query_comparison(X, Y, question):
     response = client.chat.completions.create(
         model="gpt-4-turbo",
         messages=messages,
-        max_tokens=1,
+        max_tokens=5,
         temperature=0
     )
     return response.choices[0].message.content.strip()
@@ -76,8 +76,8 @@ def save_preferences_multiple_digits(filename, question, min_digits=1, max_digit
 
 # Example usage
 save_preferences_multiple_digits(
-    filename="lotto_10.csv",
-    question="Which number is more balanced",
+    filename="../results/nicer_10.csv",
+    question="Which number is nicer",
     min_digits=1,
     max_digits=10,
     trials_per_digit=100
