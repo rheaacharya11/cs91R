@@ -3,7 +3,7 @@ import bz2
 import pandas as pd
 
 def extract_arguments_with_upvotes(file_path, max_threads=100):
-    """Extract up to 3 arguments with upvotes from each thread."""
+    """Extract up to 3 arguments with upvotes from each thread and organize them into a single row."""
     data = []
     thread_count = 0  # Counter to keep track of valid threads processed
     
@@ -24,9 +24,6 @@ def extract_arguments_with_upvotes(file_path, max_threads=100):
             
             comments = thread.get('comments', [])
             
-            # Debugging: Print details of the thread
-            print(f"Thread {thread_count + 1}: Title: {op_title}")
-            
             # Extract up to 3 arguments from comments
             extracted_args = []
             for comment in comments:
@@ -40,29 +37,31 @@ def extract_arguments_with_upvotes(file_path, max_threads=100):
                 if len(extracted_args) >= 3:
                     break
             
-            # Debugging: Print extracted arguments
-            print(f"Extracted Arguments for Thread {thread_count + 1}: {extracted_args}")
-            
             # Add arguments to the dataset
-            for arg in extracted_args:
-                data.append({
-                    'OP_Title': op_title,
-                    'OP_Text': op_text,
-                    'Argument_Text': arg['text'],
-                    'Success': arg['success'],
-                    'Upvotes': arg['upvotes']
-                })
+            row = {
+                'OP_Title': op_title,
+                'OP_Text': op_text,
+                'Argument_1_Text': extracted_args[0]['text'] if len(extracted_args) > 0 else None,
+                'Argument_1_Success': extracted_args[0]['success'] if len(extracted_args) > 0 else None,
+                'Argument_1_Upvotes': extracted_args[0]['upvotes'] if len(extracted_args) > 0 else None,
+                'Argument_2_Text': extracted_args[1]['text'] if len(extracted_args) > 1 else None,
+                'Argument_2_Success': extracted_args[1]['success'] if len(extracted_args) > 1 else None,
+                'Argument_2_Upvotes': extracted_args[1]['upvotes'] if len(extracted_args) > 1 else None,
+                'Argument_3_Text': extracted_args[2]['text'] if len(extracted_args) > 2 else None,
+                'Argument_3_Success': extracted_args[2]['success'] if len(extracted_args) > 2 else None,
+                'Argument_3_Upvotes': extracted_args[2]['upvotes'] if len(extracted_args) > 2 else None,
+            }
             
-            # Increment valid thread count
+            data.append(row)
             thread_count += 1
     
     return data
 
 # Process only the first 100 valid threads from training data
-train_data = extract_arguments_with_upvotes('../data/all/train_period_data.jsonlist.bz2', max_threads=100)
+train_data = extract_arguments_with_upvotes('train_period_data.jsonlist.bz2', max_threads=100)
 
 # Convert to DataFrame and save
 df = pd.DataFrame(train_data)
-df.to_csv('../data/arguments_with_upvotes_sample.csv', index=False)
+df.to_csv('../data/three_arguments.csv', index=False)
 
 print("Sample dataset with upvotes successfully created and saved!")
